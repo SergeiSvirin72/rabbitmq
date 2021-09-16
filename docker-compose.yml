@@ -1,0 +1,23 @@
+services:
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: 'php'
+    depends_on:
+      - rabbitmq
+    ports:
+      - 8080:80
+    volumes:
+      - .:/var/www/html/
+
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: 'rabbitmq'
+    hostname: "rabbitmq"
+    environment:
+      - RABBITMQ_DEFAULT_USER=root
+      - RABBITMQ_DEFAULT_PASS=root
+    ports:
+      - 5672:5672
+      - 15672:15672

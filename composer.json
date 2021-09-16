@@ -1,0 +1,6 @@
+{
+  "name": "sergeisvirin72/rabbitmq-tutorial",
+  "require": {
+    "php-amqplib/php-amqplib": "^3.0"
+  }
+}
