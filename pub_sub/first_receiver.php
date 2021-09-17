@@ -7,17 +7,15 @@ require_once __DIR__ . '/../vendor/autoload.php';
 $conn = new AMQPStreamConnection('rabbitmq', '5672', 'root', 'root');
 $channel = $conn->channel();
 
-$channel->queue_declare('task_queue', false, true, false, false);
+$channel->exchange_declare('logs', 'fanout', false, false, false);
+list($queueName, ,) = $channel->queue_declare('', false, false, true, false);
+$channel->queue_bind($queueName, 'logs');
 
 $callback = function ($msg) {
-    echo "[x] Received message. Sleep for : ", $msg->body, " seconds.\n";
-    sleep($msg->body);
-    echo "[x] Done.\n";
-    $msg->ack();
+    echo "[x] First receiver got message: ", $msg->body, "\n";
 };
 
-$channel->basic_qos(null, 1, null);
-$channel->basic_consume('task_queue', '', false, false, false, false, $callback);
+$channel->basic_consume($queueName, '', false, true, false, false, $callback);
 
 while ($channel->is_open()) {
     $channel->wait();

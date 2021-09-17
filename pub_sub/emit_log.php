@@ -8,15 +8,17 @@ require_once __DIR__ . '/../vendor/autoload.php';
 $conn = new AMQPStreamConnection('rabbitmq', '5672', 'root', 'root');
 $channel = $conn->channel();
 
-$channel->queue_declare('task_queue', false, true, false, false);
+$channel->exchange_declare('logs', 'fanout', false, false, false);
 
-$timeToSleep = isset($argv[1]) ? intval($argv[1]) : 0;
+$messageBody = (string)$argv[1] ?? '';
 $msg = new AMQPMessage(
-    $timeToSleep,
+    $messageBody,
     ['delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT]
 );
 
-$channel->basic_publish($msg, '', 'task_queue');
+$channel->basic_publish($msg, 'logs');
+
+echo "[x] Sent ", $messageBody, "\n";
 
 $channel->close();
 $conn->close();
