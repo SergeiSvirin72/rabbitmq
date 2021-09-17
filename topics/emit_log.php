@@ -8,16 +8,16 @@ require_once __DIR__ . '/../vendor/autoload.php';
 $conn = new AMQPStreamConnection('rabbitmq', '5672', 'root', 'root');
 $channel = $conn->channel();
 
-$channel->exchange_declare('logs', 'direct', false, false, false);
+$channel->exchange_declare('logs', 'topic', false, false, false);
 
-$messageSeverity  = $argv[1] ? strtolower($argv[1]) : 'info';
+$routingKey  = $argv[1] ? strtolower($argv[1]) : 'anonymous.info';
 $messageBody = (string)$argv[2] ?? '';
 
 $msg = new AMQPMessage($messageBody);
 
-$channel->basic_publish($msg, 'logs', $messageSeverity);
+$channel->basic_publish($msg, 'logs', $routingKey);
 
-echo "[x] Sent ", $messageSeverity, ': ', $messageBody, "\n";
+echo "[x] Sent ", $routingKey, ': ', $messageBody, "\n";
 
 $channel->close();
 $conn->close();
