@@ -1,18 +1,34 @@
 services:
-  php:
+  publisher:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: 'php'
+    container_name: 'publisher'
     depends_on:
       - rabbitmq
+    restart: on-failure
+    entrypoint: 'php publisher.php'
     ports:
       - 8080:80
     volumes:
       - .:/var/www/html/
 
+  consumer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: 'consumer'
+    depends_on:
+      - rabbitmq
+    restart: on-failure
+    entrypoint: 'php consumer.php'
+    ports:
+      - 8081:80
+    volumes:
+      - .:/var/www/html/
+
   rabbitmq:
-    image: rabbitmq:management
+    image: rabbitmq:3-management
     container_name: 'rabbitmq'
     hostname: 'rabbitmq'
     environment:

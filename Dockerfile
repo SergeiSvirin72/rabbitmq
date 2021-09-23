@@ -1,4 +1,4 @@
-FROM php:8-apache
+FROM php:8-cli
 
 RUN docker-php-ext-install sockets
 
